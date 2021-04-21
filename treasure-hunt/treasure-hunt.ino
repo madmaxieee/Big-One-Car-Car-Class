@@ -17,6 +17,11 @@ int M;
 int L2;
 int L1;
 
+enum dir
+{
+    left = 0, right = 1, back = 2
+};
+
 void motorWrite(float Vl, float Vr)
 {
   if (Vl > 255)
@@ -33,6 +38,33 @@ void motorWrite(float Vl, float Vr)
   digitalWrite(IN3, Vr > 0 ? 1 : 0);
   digitalWrite(IN2, Vl > 0 ? 0 : 1);
   digitalWrite(IN4, Vr > 0 ? 0 : 1);
+}
+
+// parameter: 0 or 1 or 2, reprenting left, right, back respectively
+// return: parameter
+int turn(dir direction){
+    switch (direction){
+        case left:
+            motorWrite(-255, -255);
+            delay(50);
+            motorWrite(-180, 255);
+            delay(850);
+            motorWrite(255, 255);
+            break;
+        case right:
+            motorWrite(-255, -255);
+            delay(50);
+            motorWrite(255, -180);
+            delay(850);
+            motorWrite(255, 255);
+            break;
+        case back:
+            motorWrite(-255, 255);
+            delay(1000);
+            motorWrite(255, 255);
+            break;
+    }
+    return direction;
 }
 
 void tracking()
@@ -89,10 +121,18 @@ void loop()
     L1 = analogRead(IR4) * 0.8;
 
     // tracking();
-    if(readMap()){
-      motorWrite(0, 0);
-    }
-    else{
-      motorWrite(0xFF, 0xFF);
-    }
+
+    // if(readMap()){
+    //   motorWrite(0, 0);
+    // }
+    // else{
+    //   motorWrite(0xFF, 0xFF);
+    // }
+
+    turn(right);
+    delay(2000);
+    // turn(2);
+    // delay(2000);
+    // turn(3);
+    // delay(2000);
 }

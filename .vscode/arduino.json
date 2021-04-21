@@ -1,0 +1,5 @@
+{
+    "board": "arduino:avr:uno",
+    "sketch": "treasure-hunt\\treasure-hunt.ino",
+    "port": "COM3"
+}
