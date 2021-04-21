@@ -62,7 +62,3 @@ class shortest_path_floyd():
         return path
     def remove_treasure(self,idx):
         self.treasure.remove(idx)
-#to do
-#轉彎方向轉換
-#和bluetooth結合
-#github desktop
