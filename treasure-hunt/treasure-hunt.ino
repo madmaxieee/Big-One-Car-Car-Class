@@ -78,7 +78,7 @@ void tracking()
   motorWrite(left, right);
 }
 
-bool readMap(){
+bool checkNode(){
     static const int threshold = 1000;
     static double arr[100]{};
     static double sum = 0;
