@@ -38,10 +38,10 @@ class bluetooth:
 
     def readString(self) -> str:
         # Scan the input buffer until meet a '\n'. return none if doesn't exist.
+        receiveMsg=None
         if(self.waiting()):
             receiveMsg = self.ser.readline().decode("utf-8")[:-1]
-
-        return receiveMsg
+            return receiveMsg
 
 def read():
     while True:
