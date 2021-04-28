@@ -122,16 +122,15 @@ void loop()
 
 #endif
 
-    rfid(idSize);
     //update sensor values
     R1 = analogRead(IR0) * 0.7;
     R2 = analogRead(IR1) * 0.5;
-    M = analogRead(IR2);
+     M = analogRead(IR2);
     L2 = analogRead(IR3) * 0.6;
     L1 = analogRead(IR4) * 0.8;
 
     if(checkNode())
-        send_msg(1);
+        send_msg('p'); // to avoid confusion with card id
     if(id = rfid(idSize))
         send_byte(id, idSize);
     turn(ask_BT());

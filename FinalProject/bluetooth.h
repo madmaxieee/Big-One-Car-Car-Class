@@ -11,7 +11,7 @@
 
 #include <SoftwareSerial.h>
 
-SoftwareSerial BT(11, 10);
+SoftwareSerial BT(8, 9);
 
 enum BT_CMD
 {
@@ -54,11 +54,16 @@ BT_CMD ask_BT()
 
 // send msg back through SoftwareSerial object: BT
 // can use send_byte alternatively to send msg back
-// (but need to convert to byte type)
+// (* noy need to convert to byte type)
 void send_msg(byte i)
 {
     BT.write(i);
     // TODO:
+} // send_msg
+
+void send_msg(char c)
+{
+    BT.write(c);
 } // send_msg
 
 // send UID back through SoftwareSerial object: BT
