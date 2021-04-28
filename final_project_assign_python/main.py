@@ -28,10 +28,11 @@ def main():
             way=maze.get_way(now,path[p])
             bt.write(dir[front][way])
             while True:
-                msg=bt.readString()
-                if msg!=None:
-                    print(msg)
-                if msg=="pass":
+                msg=bt.readByte()
+                print("aaa")
+                #if msg!=None:
+                print(msg)
+                if msg=="p":#pass
                     break
             now=path[p]
             p+=1

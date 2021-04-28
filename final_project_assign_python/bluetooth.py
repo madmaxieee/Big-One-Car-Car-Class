@@ -1,5 +1,6 @@
 import threading
 import time
+from time import sleep
 import sys
 import serial
 
@@ -36,12 +37,15 @@ class bluetooth:
         send = output.encode("utf-8")
         self.ser.write(send)
 
-    def readString(self) -> str:
+    def readByte(self):
         # Scan the input buffer until meet a '\n'. return none if doesn't exist.
-        receiveMsg=None
-        if(self.waiting()):
-            receiveMsg = self.ser.readline().decode("utf-8")[:-1]
-            return receiveMsg
+        sleep(0.05)
+        waiting = self.ser.inWaiting()
+        print(waiting)
+        if waiting >= 0:
+            rv = self.ser.read(1).decode("utf-8") 
+            return rv
+        return ""
 
 def read():
     while True:

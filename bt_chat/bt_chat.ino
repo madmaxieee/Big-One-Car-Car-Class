@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
 
-SoftwareSerial BT(11, 10);
+SoftwareSerial BT(8, 9);
 char text;
 
 void setup()
@@ -12,7 +12,7 @@ void loop()
 {
     if(Serial.available()){
         text = Serial.read();
-
+        BT.write(text);
     }
 
     if (BT.available())

@@ -1,5 +1,5 @@
-import BT
-import maze
+import bluetooth as BT
+import shortest_path_floyd as spf
 import score
 
 # hint: You may design additional functions to execute the input command, which will be helpful when debugging :)
