@@ -2,6 +2,8 @@
 #include "RFID.h"
 #include "globals.h"
 
+#define DEBUG
+
 #define IR0 A0
 #define IR1 A4
 #define IR2 A1
@@ -30,7 +32,7 @@ void setup()
     pinMode(IR3, INPUT);
     pinMode(IR4, INPUT);
     Serial.begin(9600);
-    
+
     mfrc522 = MFRC522(SS_PIN, RST_PIN);
     SPI.begin();
     mfrc522.PCD_Init();
@@ -58,28 +60,44 @@ void motorWrite(float Vl, float Vr)
 // return: parameter
 bool turn(BT_CMD direction)
 {
+    static bool stop = false;
     switch (direction)
     {
     case LEFT:
+        stop = false;
         motorWrite(-255, -255);
         delay(50);
         motorWrite(-180, 255);
-        delay(850);
-        motorWrite(255, 255);
+        delay(300);
+        motorWrite(200, 200);
         break;
     case RIGHT:
+        stop = false;
         motorWrite(-255, -255);
         delay(50);
         motorWrite(255, -180);
-        delay(850);
-        motorWrite(255, 255);
+        delay(450);
+        motorWrite(200, 200);
         break;
     case BACK:
+        stop = false;
+        motorWrite(-255, -255);
+        delay(50);
         motorWrite(-255, 255);
-        delay(1000);
-        motorWrite(255, 255);
+        delay(600);
+        motorWrite(200, 200);
+        break;
+    case STOP:
+    if (!stop){
+        motorWrite(-255, -255);
+        delay(20);
+        }
+        motorWrite(0, 0);
+        stop = true;
         break;
     case FORWARD:
+        stop = false;
+        motorWrite(200, 200);
         return false;
         break;
     }
@@ -99,7 +117,7 @@ void tracking()
 
 bool checkNode()
 {
-    static const int threshold = 1000;
+    static const int threshold = 700;
     static double arr[100]{};
     static double sum = 0;
     static int ticks = 0;
@@ -107,32 +125,39 @@ bool checkNode()
     arr[ticks % 100] = double(R2 + R1 + M + L1 + L2) / 100;
     sum += arr[ticks % 100];
     ticks++;
-    //    Serial.print("sum = ");
-    //    Serial.println(sum);
-    //    Serial.println(R2 + R1 + M + L1 + L2);
-
+#ifdef DEBUG
+//    Serial.print("sum = ");
+//    Serial.println(sum);
+//    Serial.println(R2 + R1 + M + L1 + L2);
+#endif
     return sum >= threshold;
 }
 
 void loop()
 {
     static byte *id;
-
-#ifdef DEBUG
-
-#endif
+    static int time = 0;
 
     //update sensor values
     R1 = analogRead(IR0) * 0.7;
     R2 = analogRead(IR1) * 0.5;
-     M = analogRead(IR2);
+    M = analogRead(IR2);
     L2 = analogRead(IR3) * 0.6;
     L1 = analogRead(IR4) * 0.8;
 
-    if(checkNode())
+#ifndef DEBUG
+    if (checkNode())
         send_msg('p'); // to avoid confusion with card id
-    if(id = rfid(idSize))
+    if (id = rfid(idSize))
         send_byte(id, idSize);
     turn(ask_BT());
     tracking();
+#endif
+
+#ifdef DEBUG
+    tracking();
+    if(checkNode()){
+        turn(STOP);
+    }
+#endif
 }
