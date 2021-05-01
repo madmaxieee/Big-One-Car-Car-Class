@@ -20,7 +20,8 @@ enum BT_CMD
     RIGHT,
     BACK,
     STOP,
-    FORWARD
+    FORWARD,
+    START
 };
 
 BT_CMD ask_BT()
@@ -29,9 +30,7 @@ BT_CMD ask_BT()
     char cmd;
     if (BT.available())
     {
-    //TODO:
-    // 1. get cmd from SoftwareSerial object: BT
-    // 2. link bluetooth message to your own command type
+    cmd=BT.read();
     switch(cmd){
         case 'r':
             return RIGHT;
@@ -39,8 +38,10 @@ BT_CMD ask_BT()
             return LEFT;
         case 'b':
             return BACK;
+        //case 's':
+            //return STOP;
         case 's':
-            return STOP;
+            return START;
         case 'f':
             return FORWARD;
     }
@@ -55,12 +56,11 @@ BT_CMD ask_BT()
 // send msg back through SoftwareSerial object: BT
 // can use send_byte alternatively to send msg back
 // (* noy need to convert to byte type)
-void send_msg(byte i)
-{
-    BT.write(i);
-    // TODO:
-} // send_msg
-
+//void send_msg(byte i)
+//{
+//    BT.write(i);
+//    // TODO:
+//} // send_msg
 void send_msg(char c)
 {
     BT.write(c);

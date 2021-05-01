@@ -17,15 +17,21 @@ class interface:
                 quit()
             port = input("PC bluetooth port name: ")
         input("Press enter to start.")
-        self.ser.SerialWrite('s')
+        self.ser.write('s')
 
     def get_UID(self):
         return self.ser.SerialReadByte()
 
     def send_action(self,dirc):
-        # TODO : send the action to car
+        print(dirc)
+        self.ser.write(dirc)
         return
-
+    def pass_msg(self):
+        while True:
+            msg=self.ser.readByte()
+            print(msg)
+            if msg=='P':#pass
+                break
     def end_process(self):
-        self.ser.SerialWrite('e')
+        self.ser.write('e')
         self.ser.disconnect()

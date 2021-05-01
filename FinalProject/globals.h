@@ -4,3 +4,4 @@ int R2;
 int M;
 int L2;
 int L1;
+bool lastcheck;
