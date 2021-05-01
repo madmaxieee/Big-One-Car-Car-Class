@@ -30,7 +30,7 @@ class bluetooth:
 
     def write(self, output: str):
         # Write the byte to the output buffer, encoded by utf-8.
-        send = output.encode("utf-8")
+        send = output.encode("ascii")
         self.ser.write(send)
 
     def readByte(self):
@@ -38,8 +38,8 @@ class bluetooth:
         waiting = self.ser.inWaiting()
         print(waiting)
         if waiting >= 0:
-            rv = self.ser.read(1).decode("utf-8")
-            print(rv+'%%%')
+            rv = self.ser.read(1)
+            print(rv)
             return rv
         return ""
     def SerialReadByte(self):

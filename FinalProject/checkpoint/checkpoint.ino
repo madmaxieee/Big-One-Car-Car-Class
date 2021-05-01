@@ -137,7 +137,7 @@ void loop()
 {
   static byte *id;
   static int time = 0;
-  BT.write('a');
+  static int turn = 0;
 
   //update sensor values
   R1 = analogRead(IR0) * 0.7;
@@ -145,48 +145,11 @@ void loop()
   M = analogRead(IR2);
   L2 = analogRead(IR3) * 0.6;
   L1 = analogRead(IR4) * 0.8;
-
-
-
-//#ifndef DEBUG
-//  if (checkNode())
-//    send_msg('p'); // to avoid confusion with card id
-//  if (id = rfid(idSize))
-//    send_byte(id, idSize);
-//  turn(ask_BT());
-//  tracking();
-//#endif
-//
-//#ifdef DEBUG
-//  tracking();
-//  if (checkNode()) {
-//    turn(STOP);
-//  }
-//#endif
-  BT_CMD msg;
-  static bool start_flag = 0;
-  if (!start_flag)
-  {
-    msg = ask_BT();
-    if (msg == START)
-    {
-      msg = ask_BT();
-      //drive(msg);
-      start_flag = 1;
-      msg=ask_BT();
-    }
-  }
-  else
-  {
-    tracking();
+  tracking();
     bool a=checkNode();
-    //Serial.println(a);
     if (lastcheck!=a&&a==1)
     {
-      //drive(msg);
-      
-      send_msg('p');
-      msg = ask_BT();
+        drive(dir[turn]);
     }
     if (id = rfid(idSize))
       send_byte(id, idSize);
