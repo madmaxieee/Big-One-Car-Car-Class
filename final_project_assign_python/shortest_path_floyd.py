@@ -29,7 +29,6 @@ class shortest_path_floyd():
         #     csv_data_row[i] is, if exists, the index of the neighboring node to the ith direction, with 1 <= i <= 4.
         flag=0
         for csv_data_row in csv_raw_data:
-            
             n1=csv_data_row[0]
             cnt=0
             for i in range(1,5):

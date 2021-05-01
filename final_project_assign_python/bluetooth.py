@@ -5,12 +5,8 @@ import sys
 import serial
 
 class bluetooth:
-    def __init__(self, port: str, baudrate: int=9600):
-        """ Initialize an BT object, and auto-connect it. """
-        # The port name is the name shown in control panel
-        # And the baudrate is the communication setting, default value of HC-05 is 9600.
-        self.ser = serial.Serial(port, baudrate=baudrate)
-        
+    def __init__(self):
+        self.ser = serial.Serial()
     def is_open(self) -> bool:
         return self.ser.is_open
 
@@ -38,7 +34,6 @@ class bluetooth:
         self.ser.write(send)
 
     def readByte(self):
-        # Scan the input buffer until meet a '\n'. return none if doesn't exist.
         sleep(0.05)
         waiting = self.ser.inWaiting()
         print(waiting)
@@ -46,31 +41,17 @@ class bluetooth:
             rv = self.ser.read(1).decode("utf-8") 
             return rv
         return ""
+    def SerialReadByte(self):
+        sleep(0.05)
+        waiting = self.ser.inWaiting()
+        rv = self.ser.read(waiting)
+        if(rv):
+            UID = hex(int.from_bytes(rv, byteorder='big', signed=False))
+            self.ser.flushInput()
+            return UID
+        else:
+            return 0
 
-def read():
-    while True:
-        if bt.waiting():
-            print(bt.readString())
 
-def write():
-    while True:
-        msgWrite = input()
-        
-        if msgWrite == "exit": sys.exit()
-    
-        bt.write(msgWrite + "\n")
 
-if __name__ == "__main__":
-    # Please modify the port name.
-    bt = bluetooth("COM8")
-    while not bt.is_open(): pass
-    print("BT Connected!")
 
-    readThread = threading.Thread(target=read)
-    readThread.setDaemon(True)
-    readThread.start()
-
-    while True:
-        msgWrite = input()
-        if msgWrite == "exit": sys.exit()
-        bt.write(msgWrite)
