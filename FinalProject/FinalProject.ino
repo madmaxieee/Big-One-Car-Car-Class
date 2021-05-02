@@ -17,6 +17,9 @@
 #define IN4 7
 #define ENB 6
 
+// for RFID
+#define SS_PIN 10
+
 void setup()
 {
     pinMode(ENA, OUTPUT);
@@ -31,8 +34,11 @@ void setup()
     pinMode(IR2, INPUT);
     pinMode(IR3, INPUT);
     pinMode(IR4, INPUT);
+
     Serial.begin(9600);
-    mfrc522 = MFRC522(SS_PIN);
+    // reset pin is set to 20, to avoid overwriting
+    // we need to give this parameter however the pin is useless(for what we know)
+    mfrc522 = MFRC522(SS_PIN, 20);
     SPI.begin();
     mfrc522.PCD_Init();
     BT.begin(9600);
@@ -70,6 +76,7 @@ bool drive(BT_CMD direction)
         motorWrite(-180, 255);
         delay(300);
         motorWrite(200, 200);
+        Serial.println("LEFT");
         break;
     case RIGHT:
         stop = false;
@@ -78,6 +85,7 @@ bool drive(BT_CMD direction)
         motorWrite(255, -180);
         delay(450);
         motorWrite(200, 200);
+        Serial.println("RIGHT");
         break;
     case BACK:
         stop = false;
@@ -86,6 +94,7 @@ bool drive(BT_CMD direction)
         motorWrite(-255, 255);
         delay(600);
         motorWrite(200, 200);
+        Serial.println("BACK");
         break;
     case STOP:
         if (!stop)
@@ -95,15 +104,17 @@ bool drive(BT_CMD direction)
         }
         motorWrite(0, 0);
         stop = true;
+        Serial.println("STOP");
         break;
     case FORWARD:
         stop = false;
         motorWrite(200, 200);
+        Serial.println("FORWARD");
         return false;
         break;
     case START:
         motorWrite(200, 200);
-        return false;
+        Serial.println("START");
         break;
     case DAOCHE:
         stop = false;
@@ -115,10 +126,11 @@ bool drive(BT_CMD direction)
         //backup
         motorWrite(-150, -150);
         //wait for rfid
-        while ((UID = rfid(idSize)) != 0)
+        while ((UID = rfid(idSize)) == 0)
         {
         }
-        drive(FORWARD);
+        motorWrite(200, 200);
+        Serial.println("DAOCHE");
         break;
     }
     return true;
@@ -132,9 +144,9 @@ void tracking()
     int left = 100 + 0.3 * error + 0.2 * d_error;
     int right = 100 - 0.5 * error - 0.2 * d_error;
     error = current_error;
-    motorWrite(left, right);
+    motorWrite(left * 0.7, right * 0.7);
+    Serial.println("TRACKING");
 }
-
 bool checkNode()
 {
     static const int threshold = 700;
@@ -153,12 +165,6 @@ bool checkNode()
 
 void loop()
 {
-    drive(DAOCHE);
-    delay(1000);
-    return;
-    // BT.write("a");
-    // delay(500);
-    // return;
     static byte *id;
     static int time = 0;
     UID = rfid(idSize);
@@ -187,14 +193,13 @@ void loop()
     //#endif
 
     BT_CMD msg;
-    static bool start_flag = 0;
+    static bool start_flag = false;
     if (!start_flag)
     {
         msg = ask_BT();
         if (msg == START)
         {
-            msg = ask_BT();
-            //drive(msg);
+            drive(msg);
             start_flag = 1;
             msg = ask_BT();
         }
@@ -205,7 +210,7 @@ void loop()
         if (checkNode() || UID != 0)
         {
             send_msg('p');
-            //drive(msg);
+            drive(msg);
             msg = ask_BT();
         }
         // UID is the return value of rfid()
