@@ -153,11 +153,13 @@ bool checkNode()
 
 void loop()
 {
+    // BT.write("a");
+    // delay(500);
+    // return;
     static byte *id;
     static byte *UID;
     static int time = 0;
     UID = rfid(idSize);
-    BT.write('a');
 
     //update sensor values
     R1 = analogRead(IR0) * 0.7;
