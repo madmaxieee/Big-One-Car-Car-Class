@@ -12,7 +12,6 @@
 #include <MFRC522.h>     // 引用程式庫
 /* pin---- SDA:9 SCK:13 MOSI:11 MISO:12 GND:GND RST:define on your own  */
 
-#define RST_PIN 9 // not actually here
 #define SS_PIN 10
 
 MFRC522 mfrc522;

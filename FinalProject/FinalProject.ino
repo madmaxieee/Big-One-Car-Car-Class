@@ -32,7 +32,7 @@ void setup()
     pinMode(IR3, INPUT);
     pinMode(IR4, INPUT);
     Serial.begin(9600);
-    mfrc522 = MFRC522(SS_PIN, RST_PIN);
+    mfrc522 = MFRC522(SS_PIN);
     SPI.begin();
     mfrc522.PCD_Init();
     BT.begin(9600);
@@ -115,7 +115,7 @@ bool drive(BT_CMD direction)
         //backup
         motorWrite(-150, -150);
         //wait for rfid
-        while (!rfid(idSize))
+        while ((UID = rfid(idSize)) != 0)
         {
         }
         drive(FORWARD);
@@ -153,11 +153,13 @@ bool checkNode()
 
 void loop()
 {
+    drive(DAOCHE);
+    delay(1000);
+    return;
     // BT.write("a");
     // delay(500);
     // return;
     static byte *id;
-    static byte *UID;
     static int time = 0;
     UID = rfid(idSize);
 
