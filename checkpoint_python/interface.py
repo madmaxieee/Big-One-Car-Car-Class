@@ -1,8 +1,4 @@
 import bluetooth as BT
-import shortest_path_floyd as spf
-import score
-
-# hint: You may design additional functions to execute the input command, which will be helpful when debugging :)
 
 class interface:
     def __init__(self):
@@ -18,20 +14,23 @@ class interface:
             port = input("PC bluetooth port name: ")
         input("Press enter to start.")
         self.ser.write('s')
-
+    def send_dir(self,dir):
+        self.ser.write(dir)
     def get_UID(self):
         return self.ser.SerialReadByte()
-
-    def send_action(self,dirc):
-        print(dirc)
-        self.ser.write(dirc)
-        return
-    def pass_msg(self):
+    def get_p(self):
         while True:
             msg=self.ser.readByte()
             print(msg)
             if msg=='p':#pass
                 break
+    def get_i(self):
+        while True:
+            msg=self.ser.readByte()
+            print(msg)
+            if msg=='i':#RFID start
+                break
+
     def end_process(self):
         self.ser.write('e')
         self.ser.disconnect()

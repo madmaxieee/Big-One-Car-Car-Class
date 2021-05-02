@@ -39,9 +39,9 @@ def main():
                 front=(front-1)%4
             elif dir[front][way]=='b':
                 front=(front+2)%4
-                uid=interf.get_UID()
+        uid=interf.get_UID()
         point.add_UID(uid)
-        #print(point.getCurrentScore())  
+        print(point.getCurrentScore())  
 
 if __name__ == '__main__':
     main()
