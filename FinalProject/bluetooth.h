@@ -21,7 +21,8 @@ enum BT_CMD
     BACK,
     STOP,
     FORWARD,
-    START
+    START,
+    DAOCHE
 };
 
 BT_CMD ask_BT()
@@ -44,6 +45,8 @@ BT_CMD ask_BT()
             return START;
         case 'f':
             return FORWARD;
+        case 'd':
+            return DAOCHE;
     }
     #ifdef DEBUG
             Serial.print("cmd : ");
@@ -53,14 +56,6 @@ BT_CMD ask_BT()
     return message;
 } // ask_BT
 
-// send msg back through SoftwareSerial object: BT
-// can use send_byte alternatively to send msg back
-// (* noy need to convert to byte type)
-//void send_msg(byte i)
-//{
-//    BT.write(i);
-//    // TODO:
-//} // send_msg
 void send_msg(char c)
 {
     BT.write(c);
@@ -69,6 +64,8 @@ void send_msg(char c)
 // send UID back through SoftwareSerial object: BT
 void send_byte(byte *id, byte &idSize)
 {
+    //indicates the start of communication
+    send_msg('i');
     for (byte i = 0; i < idSize; i++)
     { // Send UID consequently.
         BT.write(id[i]);
