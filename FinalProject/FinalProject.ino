@@ -137,7 +137,6 @@ void loop()
 {
   static byte *id;
   static int time = 0;
-  BT.write('a');
 
   //update sensor values
   R1 = analogRead(IR0) * 0.7;
@@ -184,7 +183,6 @@ void loop()
     if (lastcheck!=a&&a==1)
     {
       //drive(msg);
-      
       send_msg('p');
       msg = ask_BT();
     }

@@ -4,16 +4,18 @@ from time import sleep
 import sys
 import serial
 
+
 class bluetooth:
     def __init__(self):
         self.ser = serial.Serial()
+
     def is_open(self) -> bool:
         return self.ser.is_open
 
     def waiting(self) -> bool:
         return self.ser.in_waiting
 
-    def do_connect(self, port: str, baudrate: int=9600) -> bool:
+    def do_connect(self, port: str, baudrate: int = 9600) -> bool:
         """ Connect to the specify port with particular baudrate """
         # Connection function. Disconnect the previous communication, specify a new one.
         self.disconnect()
@@ -42,6 +44,7 @@ class bluetooth:
             print(rv)
             return rv
         return ""
+
     def SerialReadByte(self):
         sleep(0.05)
         waiting = self.ser.inWaiting()
@@ -52,7 +55,3 @@ class bluetooth:
             return UID
         else:
             return 0
-
-
-
-
