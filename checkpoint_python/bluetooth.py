@@ -35,8 +35,10 @@ class bluetooth:
 
     def readByte(self):
         sleep(0.05)
-        if self.waiting :
-            rv = self.ser.read(1).decode("utf-8") 
+        waiting = self.ser.inWaiting()
+        print(waiting)
+        if waiting >= 0:
+            rv = self.ser.read(1).decode("utf-8")
             print(rv)
             return rv
         return ""
