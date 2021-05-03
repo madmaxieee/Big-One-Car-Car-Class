@@ -44,11 +44,11 @@ void tracking()
 //  Serial.println(L1);
 //  Serial.println();
 //  delay(300);
-  int current_error = R1 * 0.9 + R2 * 0.35 - L2 * 0.35 - L1 * 0.9;
+  int current_error = R1 * 0.90 + R2 * 0.45 - L2 * 0.45 - L1 * 0.90;
   int d_error = current_error - error;
   // Serial.println(d_error);
-  int left = 120 + 0.4 * error + 0.3 * d_error;
-  int right = 120 - 0.4 * error - 0.3 * d_error;
+  int left = 100 + 0.4 * error + 0.3 * d_error;
+  int right = 100 - 0.5 * error - 0.3 * d_error;
   error = current_error;
   motorWrite(left, right);
   // Serial.println(error);
