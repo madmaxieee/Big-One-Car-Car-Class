@@ -33,15 +33,22 @@ void tracking()
 {
   static int error;
   int R1 = analogRead(IR0);
-  int R2 = analogRead(IR1);
+  int R2 = analogRead(IR1)*0.7;
   int M = analogRead(IR2);
   int L2 = analogRead(IR3);
-  int L1 = analogRead(IR4);
-  int current_error = R1 * 0.7 + R2 * 0.5 - L2 * 0.6 - L1 * 0.8;
+  int L1 = analogRead(IR4)*0.72;
+//  Serial.println(R1);
+//  Serial.println(R2);
+//  Serial.println(M);
+//  Serial.println(L2);
+//  Serial.println(L1);
+//  Serial.println();
+//  delay(300);
+  int current_error = R1 * 0.9 + R2 * 0.35 - L2 * 0.35 - L1 * 0.9;
   int d_error = current_error - error;
   // Serial.println(d_error);
-  int left = 140 + 0.3 * error + 0.2 * d_error;
-  int right = 140 - 0.5 * error - 0.2 * d_error;
+  int left = 120 + 0.4 * error + 0.3 * d_error;
+  int right = 120 - 0.4 * error - 0.3 * d_error;
   error = current_error;
   motorWrite(left, right);
   // Serial.println(error);
