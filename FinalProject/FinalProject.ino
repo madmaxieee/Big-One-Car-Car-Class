@@ -32,13 +32,13 @@ void setup()
   pinMode(IR2, INPUT);
   pinMode(IR3, INPUT);
   pinMode(IR4, INPUT);
-  Serial.begin(19200);
+  Serial.begin(9600);
   // reset pin is set to 20, to avoid overwriting
   // we need to give this parameter however the pin is useless(for what we know)
   mfrc522 = MFRC522(SS_PIN, 20);
   SPI.begin();
   mfrc522.PCD_Init();
-  BT.begin(19200);
+  BT.begin(9600);
   Serial.println("Done setup");
 }
 

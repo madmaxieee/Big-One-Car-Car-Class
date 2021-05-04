@@ -52,7 +52,8 @@ void motorWrite(float Vl, float Vr)
         Vl = -255;
     if (Vr < -255)
         Vr = -255;
-    analogWrite(ENA, Vl > 0 ? round(Vl) : -1*round(Vl));
+    Vl = round(Vl * 0.9);
+    analogWrite(ENA, Vl > 0 ? Vl : -Vl);
     analogWrite(ENB, Vr > 0 ? Vr : -Vr);
     digitalWrite(IN1, Vl > 0 ? 1 : 0);
     digitalWrite(IN3, Vr > 0 ? 1 : 0);
@@ -75,7 +76,7 @@ bool drive(BT_CMD direction)
         motorWrite(-180, 255);
         delay(280);
         // motorWrite(150, 150);
-        // Serial.println("LEFT");
+        BT.write('L');
     }
     else if (direction == RIGHT)
     {
@@ -87,6 +88,7 @@ bool drive(BT_CMD direction)
         delay(450);
         // motorWrite(150, 150);
         // Serial.println("RIGHT");
+        BT.write('R');
     }
     else if (direction == BACK)
     {
@@ -94,9 +96,10 @@ bool drive(BT_CMD direction)
         delay(100);
         drive(STOP);
         delay(300);
-        motorWrite(-255, 255);
+        motorWrite(-200, 200);
         delay(600);
         //Serial.println("BACK");
+        BT.write('B');
     }
     else if (direction == STOP)
     {
@@ -115,6 +118,7 @@ bool drive(BT_CMD direction)
         motorWrite(150, 150);
         delay(500);
         //Serial.println("FORWARD");
+        BT.write('F');
         return false;
     }
     else if (direction == START)
@@ -155,6 +159,11 @@ void tracking()
         left = right = 100;
     error = current_error;
     //Serial.println(error);
+    if (R1 < 200 && R2 < 200 && M < 200 && L1 < 200 && L2 < 200 && abs(error) < 100)
+    {
+        motorWrite(-100, -100);
+        return;
+    }
     if (error > 0)
         motorWrite(100 + left, 100 + right);
     else
@@ -166,6 +175,7 @@ void tracking()
 // if in node return 2
 int checkNode()
 {
+    static int last_node_time = 0;
     static const int threshold = 1200;
     // static double arr[10] {};
     static double sum = 0;
@@ -181,34 +191,29 @@ int checkNode()
 
     if (!pFlag)
         return 0;
-    if (!temp && pFlag)
+    if (!temp && pFlag && millis() - last_node_time > 1500){
+        last_node_time = millis();
         return 1;
+    }
     if (pFlag)
         return 2;
 }
 
 void loop()
 {
-    // motorWrite(100, 100);
-    // while ((UID = rfid(idSize)) == 0)
-    // {
-    // }
-    // motorWrite(-100, -100);
-    // delay(1000);
-    // return;
     static int i = 0;
     // static BT_CMD dir[] = {FORWARD, FORWARD, FORWARD, DAOCHE,
     //                        FORWARD, FORWARD, RIGHT,   LEFT,
     //                        RIGHT,   BACK,    FORWARD};
-    static BT_CMD dir[] = {FORWARD, FORWARD, LEFT, LEFT, FORWARD};
-    //UID = rfid(idSize);
+    static BT_CMD dir[] = {LEFT, FORWARD, RIGHT, RIGHT, BACK, LEFT, RIGHT};
+    UID = rfid(idSize);
     R1 = analogRead(IR0);
     R2 = analogRead(IR1) * 0.7;
     M = analogRead(IR2);
     L2 = analogRead(IR3);
     L1 = analogRead(IR4) * 0.72;
 
-    static bool start_flag = true;
+    static bool start_flag = false;
     BT_CMD msg;
     if (!start_flag)
     {
@@ -221,25 +226,25 @@ void loop()
     }
     else
     {
-//        if (checkNode() == 1 || UID != 0)
-//        {
-//            // drive(STOP);
-//            // delay(1000);
-//            drive(dir[i]);
-//            i++;
-//        }
-//        else if (checkNode() == 0)
-//        {
-//            tracking();
-//        }
-//        else if (checkNode() == 2)
-//        {
-//            motorWrite(100, 100);
-//        }
-          motorWrite(200,200);
+       if (checkNode() == 1 || UID != 0)
+       {
+           // drive(STOP);
+           // delay(1000);
+           drive(dir[i]);
+           i++;
+       }
+       else if (checkNode() == 0)
+       {
+           tracking();
+       }
+       else if (checkNode() == 2)
+       {
+           motorWrite(100, 100);
+       }
+        //   motorWrite(200,200);
 
         // UID is the return value of rfid()
         // 0 if nothing detected (won't send anything)
-        // send_byte(UID, idSize);
+        send_byte(UID, idSize);
     }
 }

@@ -11,7 +11,9 @@ class interface:
             if(port == "quit"):
                 self.ser.disconnect()
                 quit()
-            port = input("PC bluetooth port name: ")
+            port = "COM8";
+            input("Connecting...");
+            # port = input("PC bluetooth port name: ")
         input("Press enter to start.")
         self.ser.write('s')
     def send_dir(self,dir):

@@ -6,3 +6,4 @@ int L1;
 bool lastcheck;
 byte idSize;
 byte *UID = 0;
+int clock = 0;
