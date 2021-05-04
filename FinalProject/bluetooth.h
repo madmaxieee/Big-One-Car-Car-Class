@@ -1,9 +1,9 @@
 /***************************************************************************/
-// File			  [bluetooth.h]
-// Author		  [Erik Kuo]
-// Synopsis		[Code for bluetooth communication]
+// File        [bluetooth.h]
+// Author     [Erik Kuo]
+// Synopsis   [Code for bluetooth communication]
 // Functions  [ask_BT, send_msg, send_byte]
-// Modify		  [2020/03/27 Erik Kuo]
+// Modify     [2020/03/27 Erik Kuo]
 /***************************************************************************/
 
 /*if you have no idea how to start*/
@@ -33,8 +33,7 @@ BT_CMD ask_BT()
     {
     }
     cmd = BT.read();
-    delay(30);
-    BT.write(cmd);
+    //BT.write(cmd);
     switch (cmd)
     {
     case 'r':
