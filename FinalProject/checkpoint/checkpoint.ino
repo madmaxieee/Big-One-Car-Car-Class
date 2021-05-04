@@ -44,6 +44,8 @@ void setup()
 
 void motorWrite(float Vl, float Vr)
 {
+    static int ticks = 0;
+    
     if (Vl > 255)
         Vl = 255;
     if (Vr > 255)
@@ -53,6 +55,14 @@ void motorWrite(float Vl, float Vr)
     if (Vr < -255)
         Vr = -255;
     Vl = round(Vl * 0.9);
+    sVl -= aVl[ticks];
+    sVr -= aVr[ticks];
+    aVl[ticks] = double(Vl) / 50;
+    aVr[ticks] = double(Vr) / 50;
+    sVl += aVl[ticks];
+    sVr += aVr[ticks];
+    ticks++;
+    ticks %= 50;
     analogWrite(ENA, Vl > 0 ? Vl : -Vl);
     analogWrite(ENB, Vr > 0 ? Vr : -Vr);
     digitalWrite(IN1, Vl > 0 ? 1 : 0);
@@ -72,23 +82,23 @@ bool drive(BT_CMD direction)
         stop = false;
         delay(200);
         drive(STOP);
-        delay(300);
+        delay(500);
         motorWrite(-180, 255);
-        delay(280);
+        delay(250);
         // motorWrite(150, 150);
-        BT.write('L');
+        // BT.write('L');
     }
     else if (direction == RIGHT)
     {
         stop = false;
         delay(200);
         drive(STOP);
-        delay(300);
+        delay(500);
         motorWrite(255, -180);
         delay(450);
         // motorWrite(150, 150);
         // Serial.println("RIGHT");
-        BT.write('R');
+        // BT.write('R');
     }
     else if (direction == BACK)
     {
@@ -99,7 +109,7 @@ bool drive(BT_CMD direction)
         motorWrite(-200, 200);
         delay(600);
         //Serial.println("BACK");
-        BT.write('B');
+        // BT.write('B');
     }
     else if (direction == STOP)
     {
@@ -116,9 +126,9 @@ bool drive(BT_CMD direction)
     {
         stop = false;
         motorWrite(150, 150);
-        delay(500);
+        delay(200);
         //Serial.println("FORWARD");
-        BT.write('F');
+        // BT.write('F');
         return false;
     }
     else if (direction == START)
@@ -146,18 +156,28 @@ bool drive(BT_CMD direction)
     return true;
 }
 
+void updateIR()
+{
+    R1 = analogRead(IR0);
+    R2 = analogRead(IR1) * 0.7;
+    M = analogRead(IR2);
+    L2 = analogRead(IR3);
+    L1 = analogRead(IR4) * 0.72;
+}
+
 void tracking()
 {
     static int error;
-
+    updateIR();
     int current_error = R1 * 0.90 + R2 * 0.45 - L2 * 0.45 - L1 * 0.90;
     int d_error = current_error - error;
     // Serial.println(d_error);
-    int left = 0.4 * error + 0.3 * d_error;
-    int right = -0.5 * error - 0.3 * d_error;
+    int left = 0.4 * error + 0 * d_error;
+    int right = -0.5 * error - 0 * d_error;
     if (M + R2 + L2 >= 900)
-        left = right = 100;
+        left = right = 0;
     error = current_error;
+
     //Serial.println(error);
     if (R1 < 200 && R2 < 200 && M < 200 && L1 < 200 && L2 < 200 && abs(error) < 100)
     {
@@ -176,7 +196,7 @@ void tracking()
 int checkNode()
 {
     static int last_node_time = 0;
-    static const int threshold = 1200;
+    static const int threshold = 1500;
     // static double arr[10] {};
     static double sum = 0;
     // static int ticks = 0;
@@ -191,8 +211,10 @@ int checkNode()
 
     if (!pFlag)
         return 0;
-    if (!temp && pFlag && millis() - last_node_time > 1500){
-        last_node_time = millis();
+    if (!temp && pFlag && sVl + sVr > 30)
+    {
+        //last_node_time = millis();
+        //Serial.println(sVl + sVr);
         return 1;
     }
     if (pFlag)
@@ -201,17 +223,26 @@ int checkNode()
 
 void loop()
 {
+    R1 = analogRead(IR0);
+    R2 = analogRead(IR1) * 0.7;
+    M = analogRead(IR2);
+    L2 = analogRead(IR3);
+    L1 = analogRead(IR4) * 0.72;
+    if (checkNode() == 0)
+    {
+        tracking();
+    }
+    else if (checkNode() == 2)
+    {
+        motorWrite(100, 100);
+    }
+    return;
     static int i = 0;
     // static BT_CMD dir[] = {FORWARD, FORWARD, FORWARD, DAOCHE,
     //                        FORWARD, FORWARD, RIGHT,   LEFT,
     //                        RIGHT,   BACK,    FORWARD};
     static BT_CMD dir[] = {LEFT, FORWARD, RIGHT, RIGHT, BACK, LEFT, RIGHT};
     UID = rfid(idSize);
-    R1 = analogRead(IR0);
-    R2 = analogRead(IR1) * 0.7;
-    M = analogRead(IR2);
-    L2 = analogRead(IR3);
-    L1 = analogRead(IR4) * 0.72;
 
     static bool start_flag = false;
     BT_CMD msg;
@@ -226,21 +257,22 @@ void loop()
     }
     else
     {
-       if (checkNode() == 1 || UID != 0)
-       {
-           // drive(STOP);
-           // delay(1000);
-           drive(dir[i]);
-           i++;
-       }
-       else if (checkNode() == 0)
-       {
-           tracking();
-       }
-       else if (checkNode() == 2)
-       {
-           motorWrite(100, 100);
-       }
+        updateIR();
+        if (checkNode() == 1)
+        {
+            // drive(STOP);
+            // delay(1000);
+            drive(dir[i]);
+            i++;
+        }
+        else if (checkNode() == 0)
+        {
+            tracking();
+        }
+        else if (checkNode() == 2)
+        {
+            motorWrite(100, 100);
+        }
         //   motorWrite(200,200);
 
         // UID is the return value of rfid()
