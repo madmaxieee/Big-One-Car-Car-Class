@@ -6,7 +6,7 @@ class interface:
         print("Arduino Bluetooth Connect Program.")
         print("")
         self.ser = BT.bluetooth()
-        port = input("PC bluetooth port name: ")
+        port = "com6"
         while(not self.ser.do_connect(port)):
             if(port == "quit"):
                 self.ser.disconnect()

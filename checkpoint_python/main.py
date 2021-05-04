@@ -11,10 +11,9 @@ def main():
             interf.send_dir(dir[i]) 
         else:
             interf.get_p() 
-            interf.send_dir(dir[i])      
+            interf.send_dir(dir[i])       
     interf.get_i()
     uid=interf.get_UID()
     print(uid)
 if __name__ == '__main__':
     main()
-
