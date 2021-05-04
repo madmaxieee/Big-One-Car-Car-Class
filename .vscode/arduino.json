@@ -1,6 +1,6 @@
 {
     "board": "arduino:avr:uno",
-    "port": "COM3",
-    "sketch": "FinalProject\\FinalProject.ino",
+    "port": "COM9",
+    "sketch": "FinalProject\\checkpoint\\checkpoint.ino",
     "output": "D:\\文件\\Arduino\\ArduinoOutput"
 }

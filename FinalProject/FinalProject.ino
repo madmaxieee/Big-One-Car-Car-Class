@@ -2,8 +2,6 @@
 #include "RFID.h"
 #include "globals.h"
 
-#define DEBUG
-
 #define IR0 A0
 #define IR1 A4
 #define IR2 A1
@@ -34,13 +32,13 @@ void setup()
   pinMode(IR2, INPUT);
   pinMode(IR3, INPUT);
   pinMode(IR4, INPUT);
-  Serial.begin(9600);
+  Serial.begin(19200);
   // reset pin is set to 20, to avoid overwriting
   // we need to give this parameter however the pin is useless(for what we know)
   mfrc522 = MFRC522(SS_PIN, 20);
   SPI.begin();
   mfrc522.PCD_Init();
-  BT.begin(9600);
+  BT.begin(19200);
   Serial.println("Done setup");
 }
 
@@ -157,7 +155,7 @@ void tracking()
   int left = 100 + 0.4 * error + 0.3 * d_error;
   int right = 100 - 0.5 * error - 0.3 * d_error;
   if (M + R2 + L2 >= 900)
-    left = right = 150;
+    left = right = 100;
   error = current_error;
   //Serial.println(error);
   motorWrite(left, right);
@@ -168,17 +166,17 @@ void tracking()
 // if in node return 2
 int checkNode()
 {
-  static const int threshold = 1200;
-  static double arr[100] {};
+  static const int threshold = 1000;
+  // static double arr[10] {};
   static double sum = 0;
-  static int ticks = 0;
+  // static int ticks = 0;
   static bool pFlag = false;
-  sum -= arr[ticks % 100];
-  arr[ticks % 100] = double(R2 + R1 + M + L1 + L2) / 100;
-  sum += arr[ticks % 100];
-  ticks++;
+  // sum -= arr[ticks % 10];
+  // arr[ticks % 10] = double(R2 + R1 + M + L1 + L2) / 10;
+  // sum += arr[ticks % 10];
+  sum = R2 + R1 + M + L1 + L2;
+  // ticks++;
   bool temp = pFlag;
-  Serial.println(sum);
   pFlag = sum >= threshold;
 
   if (!pFlag)
@@ -202,12 +200,12 @@ void loop()
   // L1 = analogRead(IR4) * 0.8;
   R1 = analogRead(IR0);
   R2 = analogRead(IR1) * 0.7;
-  M = analogRead(IR2);
+  M  = analogRead(IR2);
   L2 = analogRead(IR3);
   L1 = analogRead(IR4) * 0.72;
 
   BT_CMD msg;
-  static bool start_flag = false;
+  static bool start_flag = true;
   if (!start_flag)
   {
     msg = ask_BT();
@@ -220,25 +218,20 @@ void loop()
   }
   else
   {
-    if(checkNode()==1)
+    if (checkNode() == 1 || UID != 0)
     {
-        send_msg('p');
-        drive(msg);
-        msg = ask_BT();
+      drive(RIGHT);
+      // send_msg('p');
+      // drive(msg);
+      // msg = ask_BT();
     }
-    else if(checkNode()==0)
+    else if(checkNode() == 0)
     {
-      Serial.println('q');
-        
+      tracking();
     }
-    // if (UID != 0)
-    // {
-    //     send_msg('p');
-    //     drive(msg);
-    //     msg = ask_BT();
-    // }
+
     // UID is the return value of rfid()
-    // 0 if nothing detected
+    // 0 if nothing detected (won't send anything)
     send_byte(UID, idSize);
   }
 }
