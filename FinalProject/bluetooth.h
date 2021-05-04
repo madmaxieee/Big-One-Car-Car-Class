@@ -33,6 +33,7 @@ BT_CMD ask_BT()
     {
     }
     cmd = BT.read();
+    delay(30);
     BT.write(cmd);
     switch (cmd)
     {
