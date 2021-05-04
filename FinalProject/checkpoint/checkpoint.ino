@@ -52,7 +52,7 @@ void motorWrite(float Vl, float Vr)
         Vl = -255;
     if (Vr < -255)
         Vr = -255;
-    analogWrite(ENA, Vl > 0 ? Vl : -Vl);
+    analogWrite(ENA, Vl > 0 ? round(Vl) : -1*round(Vl));
     analogWrite(ENB, Vr > 0 ? Vr : -Vr);
     digitalWrite(IN1, Vl > 0 ? 1 : 0);
     digitalWrite(IN3, Vr > 0 ? 1 : 0);
@@ -221,21 +221,22 @@ void loop()
     }
     else
     {
-        if (checkNode() == 1 || UID != 0)
-        {
-            // drive(STOP);
-            // delay(1000);
-            drive(dir[i]);
-            i++;
-        }
-        else if (checkNode() == 0)
-        {
-            tracking();
-        }
-        else if (checkNode() == 2)
-        {
-            motorWrite(100, 100);
-        }
+//        if (checkNode() == 1 || UID != 0)
+//        {
+//            // drive(STOP);
+//            // delay(1000);
+//            drive(dir[i]);
+//            i++;
+//        }
+//        else if (checkNode() == 0)
+//        {
+//            tracking();
+//        }
+//        else if (checkNode() == 2)
+//        {
+//            motorWrite(100, 100);
+//        }
+          motorWrite(200,200);
 
         // UID is the return value of rfid()
         // 0 if nothing detected (won't send anything)
