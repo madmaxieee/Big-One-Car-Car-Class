@@ -71,6 +71,7 @@ bool drive(BT_CMD direction)
         stop = false;
         delay(200);
         drive(STOP);
+        delay(300);
         motorWrite(-180, 255);
         delay(280);
         // motorWrite(150, 150);
@@ -102,7 +103,7 @@ bool drive(BT_CMD direction)
         if (!stop)
         {
             motorWrite(-255, -255);
-            delay(20);
+            delay(50);
         }
         motorWrite(0, 0);
         stop = true;
@@ -165,7 +166,7 @@ void tracking()
 // if in node return 2
 int checkNode()
 {
-    static const int threshold = 1000;
+    static const int threshold = 1200;
     // static double arr[10] {};
     static double sum = 0;
     // static int ticks = 0;
