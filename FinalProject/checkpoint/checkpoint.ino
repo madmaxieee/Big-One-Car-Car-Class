@@ -69,31 +69,32 @@ bool drive(BT_CMD direction)
     if (direction == LEFT)
     {
         stop = false;
-        motorWrite(-255, -255);
-        delay(50);
+        delay(200);
+        drive(STOP);
         motorWrite(-180, 255);
-        delay(370);
-        motorWrite(150, 150);
-        //Serial.println("LEFT");
+        delay(280);
+        // motorWrite(150, 150);
+        // Serial.println("LEFT");
     }
     else if (direction == RIGHT)
     {
         stop = false;
-        motorWrite(-255, -255);
-        delay(50);
+        delay(200);
+        drive(STOP);
+        delay(300);
         motorWrite(255, -180);
         delay(450);
-        motorWrite(200, 200);
-        //Serial.println("RIGHT");
+        // motorWrite(150, 150);
+        // Serial.println("RIGHT");
     }
     else if (direction == BACK)
     {
         stop = false;
-        motorWrite(-255, -255);
-        delay(50);
+        delay(100);
+        drive(STOP);
+        delay(300);
         motorWrite(-255, 255);
         delay(600);
-        motorWrite(200, 200);
         //Serial.println("BACK");
     }
     else if (direction == STOP)
@@ -111,6 +112,7 @@ bool drive(BT_CMD direction)
     {
         stop = false;
         motorWrite(150, 150);
+        delay(500);
         //Serial.println("FORWARD");
         return false;
     }
@@ -146,13 +148,16 @@ void tracking()
     int current_error = R1 * 0.90 + R2 * 0.45 - L2 * 0.45 - L1 * 0.90;
     int d_error = current_error - error;
     // Serial.println(d_error);
-    int left = 100 + 0.4 * error + 0.3 * d_error;
-    int right = 100 - 0.5 * error - 0.3 * d_error;
+    int left = 0.4 * error + 0.3 * d_error;
+    int right = -0.5 * error - 0.3 * d_error;
     if (M + R2 + L2 >= 900)
         left = right = 100;
     error = current_error;
     //Serial.println(error);
-    motorWrite(left, right);
+    if (error > 0)
+        motorWrite(100 + left, 100 + right);
+    else
+        motorWrite(100 + left * 0.8, 100 + right * 0.8);
 }
 
 // if out of node return 0
@@ -175,7 +180,7 @@ int checkNode()
 
     if (!pFlag)
         return 0;
-    if (temp != sum >= threshold)
+    if (!temp && pFlag)
         return 1;
     if (pFlag)
         return 2;
@@ -183,19 +188,26 @@ int checkNode()
 
 void loop()
 {
+    // motorWrite(100, 100);
+    // while ((UID = rfid(idSize)) == 0)
+    // {
+    // }
+    // motorWrite(-100, -100);
+    // delay(1000);
+    // return;
     static int i = 0;
     // static BT_CMD dir[] = {FORWARD, FORWARD, FORWARD, DAOCHE,
     //                        FORWARD, FORWARD, RIGHT,   LEFT,
     //                        RIGHT,   BACK,    FORWARD};
-    static BT_CMD dir[] = {FORWARD, DAOCHE, FORWARD, FORWARD, RIGHT};
-    UID = rfid(idSize);
+    static BT_CMD dir[] = {FORWARD, FORWARD, LEFT, LEFT, FORWARD};
+    //UID = rfid(idSize);
     R1 = analogRead(IR0);
     R2 = analogRead(IR1) * 0.7;
     M = analogRead(IR2);
     L2 = analogRead(IR3);
     L1 = analogRead(IR4) * 0.72;
 
-    static bool start_flag = false;
+    static bool start_flag = true;
     BT_CMD msg;
     if (!start_flag)
     {
@@ -210,6 +222,8 @@ void loop()
     {
         if (checkNode() == 1 || UID != 0)
         {
+            // drive(STOP);
+            // delay(1000);
             drive(dir[i]);
             i++;
         }
@@ -217,9 +231,13 @@ void loop()
         {
             tracking();
         }
+        else if (checkNode() == 2)
+        {
+            motorWrite(100, 100);
+        }
 
         // UID is the return value of rfid()
         // 0 if nothing detected (won't send anything)
-        send_byte(UID, idSize);
+        // send_byte(UID, idSize);
     }
 }
