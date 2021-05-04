@@ -186,8 +186,6 @@ void loop()
     L2 = analogRead(IR3) * 0.6;
     L1 = analogRead(IR4) * 0.8;
 
-    tracking();
-    return;
     //#ifndef DEBUG
     //  if (checkNode())
     //    send_msg('p'); // to avoid confusion with card id
@@ -212,7 +210,7 @@ void loop()
         if (msg == START)
         {
             drive(msg);
-            start_flag = 1;
+            start_flag = true;
             msg = ask_BT();
         }
     }

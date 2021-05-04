@@ -1,5 +1,6 @@
 {
     "board": "arduino:avr:uno",
     "port": "COM3",
-    "sketch": "simple_tracking-D\\simple_tracking-D.ino"
+    "sketch": "FinalProject\\FinalProject.ino",
+    "output": "D:\\文件\\Arduino\\ArduinoOutput"
 }
