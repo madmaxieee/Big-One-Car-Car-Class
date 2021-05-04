@@ -42,6 +42,7 @@ void setup()
     SPI.begin();
     mfrc522.PCD_Init();
     BT.begin(9600);
+    Serial.println("Done setup");
 }
 
 void motorWrite(float Vl, float Vr)
@@ -76,7 +77,7 @@ bool drive(BT_CMD direction)
         motorWrite(-180, 255);
         delay(300);
         motorWrite(200, 200);
-        Serial.println("LEFT");
+        //Serial.println("LEFT");
         break;
     case RIGHT:
         stop = false;
@@ -85,7 +86,7 @@ bool drive(BT_CMD direction)
         motorWrite(255, -180);
         delay(450);
         motorWrite(200, 200);
-        Serial.println("RIGHT");
+        //Serial.println("RIGHT");
         break;
     case BACK:
         stop = false;
@@ -94,7 +95,7 @@ bool drive(BT_CMD direction)
         motorWrite(-255, 255);
         delay(600);
         motorWrite(200, 200);
-        Serial.println("BACK");
+        //Serial.println("BACK");
         break;
     case STOP:
         if (!stop)
@@ -104,17 +105,17 @@ bool drive(BT_CMD direction)
         }
         motorWrite(0, 0);
         stop = true;
-        Serial.println("STOP");
+        //Serial.println("STOP");
         break;
     case FORWARD:
         stop = false;
         motorWrite(200, 200);
-        Serial.println("FORWARD");
+        //Serial.println("FORWARD");
         return false;
         break;
     case START:
         motorWrite(200, 200);
-        Serial.println("START");
+        //Serial.println("START");
         break;
     case DAOCHE:
         stop = false;
@@ -130,7 +131,7 @@ bool drive(BT_CMD direction)
         {
         }
         motorWrite(200, 200);
-        Serial.println("DAOCHE");
+        //Serial.println("DAOCHE");
         break;
     }
     return true;
@@ -144,12 +145,15 @@ void tracking()
     int left = 100 + 0.3 * error + 0.2 * d_error;
     int right = 100 - 0.5 * error - 0.2 * d_error;
     error = current_error;
-    motorWrite(left * 0.7, right * 0.7);
-    Serial.println("TRACKING");
+    motorWrite(left * 0.8, right * 0.8);
 }
-bool checkNode()
+
+// if out of node return 0
+// if enter node return 1
+// if in node return 2
+int checkNode()
 {
-    static const int threshold = 700;
+    static const int threshold = 600;
     static double arr[100]{};
     static double sum = 0;
     static int ticks = 0;
@@ -160,7 +164,13 @@ bool checkNode()
     ticks++;
     bool temp = pFlag;
     pFlag = sum >= threshold;
-    return temp != sum >= threshold;
+
+    if (!pFlag)
+        return 0;
+    if (temp != sum >= threshold)
+        return 1;
+    if (pFlag)
+        return 2;
 }
 
 void loop()
@@ -172,10 +182,12 @@ void loop()
     //update sensor values
     R1 = analogRead(IR0) * 0.7;
     R2 = analogRead(IR1) * 0.5;
-     M = analogRead(IR2);
+    M = analogRead(IR2);
     L2 = analogRead(IR3) * 0.6;
     L1 = analogRead(IR4) * 0.8;
 
+    tracking();
+    return;
     //#ifndef DEBUG
     //  if (checkNode())
     //    send_msg('p'); // to avoid confusion with card id
@@ -206,8 +218,9 @@ void loop()
     }
     else
     {
-        tracking();
-        if (checkNode() || UID != 0)
+        if (checkNode() == 0)
+            tracking();
+        if (checkNode() == 1 || UID != 0)
         {
             send_msg('p');
             drive(msg);

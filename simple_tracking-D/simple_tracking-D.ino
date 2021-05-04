@@ -11,6 +11,12 @@
 #define IN4 7
 #define ENB 6
 
+int R1 = 0;
+int R2 = 0;
+int M = 0;
+int L2 = 0;
+int L1 = 0;
+
 void motorWrite(float Vl, float Vr)
 {
   if (Vl > 255)
@@ -32,23 +38,13 @@ void motorWrite(float Vl, float Vr)
 void tracking()
 {
   static int error;
-  int R1 = analogRead(IR0);
-  int R2 = analogRead(IR1);
-  int M = analogRead(IR2);
-  int L2 = analogRead(IR3);
-  int L1 = analogRead(IR4);
-  int current_error = R1 * 0.7 + R2 * 0.5 - L2 * 0.6 - L1 * 0.8;
+  int current_error = R1 + R2 - L2 - L1;
   int d_error = current_error - error;
-  // Serial.println(d_error);
-  int left = 140 + 0.3 * error + 0.2 * d_error;
-  int right = 140 - 0.5 * error - 0.2 * d_error;
+  int left = 100 + 0.35 * error + 0.2 * d_error;
+  int right = 100 - 0.4 * error - 0.2 * d_error;
   error = current_error;
+  //Serial.println(error);
   motorWrite(left, right);
-  // Serial.println(error);
-  // Serial.println(left);
-  // Serial.println(right);
-  // Serial.println();
-  // delay(1000);
 }
 
 void setup()
@@ -70,5 +66,19 @@ void setup()
 
 void loop()
 {
+  R1 = analogRead(IR0) * 0.9;
+  R2 = analogRead(IR1) * 0.5;
+  M = analogRead(IR2);
+  L2 = analogRead(IR3) * 0.6;
+  L1 = analogRead(IR4) * 0.7;
+
+  // Serial.println(R1);
+  // Serial.println(R2);
+  // Serial.println(M);
+  // Serial.println(L2);
+  // Serial.println(L1);
+  // Serial.println();
+  // delay(1000);
+
   tracking();
 }

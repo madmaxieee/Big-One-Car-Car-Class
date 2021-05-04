@@ -1,5 +1,5 @@
 {
     "board": "arduino:avr:uno",
     "port": "COM3",
-    "sketch": "FinalProject\\FinalProject.ino"
+    "sketch": "simple_tracking-D\\simple_tracking-D.ino"
 }

@@ -42,8 +42,10 @@ BT_CMD ask_BT()
         //case 's':
             //return STOP;
         case 's':
+            //Serial.println(cmd);
             return START;
         case 'f':
+            //Serial.println(cmd);
             return FORWARD;
         case 'd':
             return DAOCHE;
