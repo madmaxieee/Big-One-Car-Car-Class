@@ -38,10 +38,23 @@ void motorWrite(float Vl, float Vr)
 void tracking()
 {
   static int error;
-  int current_error = R1 + R2 - L2 - L1;
+  int R1 = analogRead(IR0);
+  int R2 = analogRead(IR1)*0.7;
+  int M = analogRead(IR2);
+  int L2 = analogRead(IR3);
+  int L1 = analogRead(IR4)*0.72;
+//  Serial.println(R1);
+//  Serial.println(R2);
+//  Serial.println(M);
+//  Serial.println(L2);
+//  Serial.println(L1);
+//  Serial.println();
+//  delay(300);
+  int current_error = R1 * 0.90 + R2 * 0.45 - L2 * 0.45 - L1 * 0.90;
   int d_error = current_error - error;
-  int left = 100 + 0.35 * error + 0.2 * d_error;
-  int right = 100 - 0.4 * error - 0.2 * d_error;
+  // Serial.println(d_error);
+  int left = 100 + 0.4 * error + 0.3 * d_error;
+  int right = 100 - 0.5 * error - 0.3 * d_error;
   error = current_error;
   //Serial.println(error);
   motorWrite(left, right);
