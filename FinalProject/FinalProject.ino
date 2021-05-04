@@ -75,7 +75,7 @@ bool drive(BT_CMD direction)
         motorWrite(-255, -255);
         delay(50);
         motorWrite(-180, 255);
-        delay(300);
+        delay(350);
         motorWrite(200, 200);
         //Serial.println("LEFT");
         break;
@@ -123,7 +123,7 @@ bool drive(BT_CMD direction)
         motorWrite(-255, -255);
         delay(50);
         motorWrite(-180, 255);
-        delay(300);
+        delay(350);
         //backup
         motorWrite(-150, -150);
         //wait for rfid
@@ -148,7 +148,7 @@ void tracking()
     int left = 100 + 0.4 * error + 0.3 * d_error;
     int right = 100 - 0.5 * error - 0.3 * d_error;
     if (M + R2 + L2 >= 900)
-        left = right = 200;
+        left = right = 150;
     error = current_error;
     //Serial.println(error);
     motorWrite(left, right);
@@ -210,14 +210,22 @@ void loop()
     }
     else
     {
-        if (checkNode() == 0)
-            tracking();
-        if (checkNode() == 1 || UID != 0)
-        {
-            send_msg('p');
-            drive(msg);
-            msg = ask_BT();
+        switch (checkNode()){
+            case 0:
+                tracking();
+                break;
+            case 1:
+                send_msg('p');
+                drive(msg);
+                msg = ask_BT();
+                break;
         }
+        // if (UID != 0)
+        // {
+        //     send_msg('p');
+        //     drive(msg);
+        //     msg = ask_BT();
+        // }
         // UID is the return value of rfid()
         // 0 if nothing detected
         send_byte(UID, idSize);

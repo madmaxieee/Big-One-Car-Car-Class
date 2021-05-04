@@ -5,4 +5,4 @@ int L2;
 int L1;
 bool lastcheck;
 byte idSize;
-byte *UID;
+byte *UID = 0;

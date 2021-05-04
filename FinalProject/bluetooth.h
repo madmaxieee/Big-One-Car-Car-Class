@@ -29,32 +29,34 @@ BT_CMD ask_BT()
 {
     BT_CMD message = NOTHING;
     char cmd;
-    if (BT.available())
+    while (!BT.available())
     {
-    cmd=BT.read();
-    switch(cmd){
-        case 'r':
-            return RIGHT;
-        case 'l':
-            return LEFT;
-        case 'b':
-            return BACK;
-        //case 's':
-            //return STOP;
-        case 's':
-            //Serial.println(cmd);
-            return START;
-        case 'f':
-            //Serial.println(cmd);
-            return FORWARD;
-        case 'd':
-            return DAOCHE;
     }
-    #ifdef DEBUG
-            Serial.print("cmd : ");
-            Serial.println(cmd);
-    #endif
+    cmd = BT.read();
+    BT.write(cmd);
+    switch (cmd)
+    {
+    case 'r':
+        return RIGHT;
+    case 'l':
+        return LEFT;
+    case 'b':
+        return BACK;
+    //case 's':
+    //return STOP;
+    case 's':
+        //Serial.println(cmd);
+        return START;
+    case 'f':
+        //Serial.println(cmd);
+        return FORWARD;
+    case 'd':
+        return DAOCHE;
     }
+#ifdef DEBUG
+    Serial.print("cmd : ");
+    Serial.println(cmd);
+#endif
     return message;
 } // ask_BT
 
@@ -66,7 +68,7 @@ void send_msg(char c)
 // send UID back through SoftwareSerial object: BT
 void send_byte(byte *id, byte &idSize)
 {
-    if(!id)
+    if (!id)
         return;
     //indicates the start of communication
     send_msg('i');
