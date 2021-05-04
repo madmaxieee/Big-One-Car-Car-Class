@@ -66,6 +66,8 @@ void send_msg(char c)
 // send UID back through SoftwareSerial object: BT
 void send_byte(byte *id, byte &idSize)
 {
+    if(!id)
+        return;
     //indicates the start of communication
     send_msg('i');
     for (byte i = 0; i < idSize; i++)

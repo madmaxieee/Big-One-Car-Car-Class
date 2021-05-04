@@ -140,12 +140,18 @@ bool drive(BT_CMD direction)
 void tracking()
 {
     static int error;
-    int current_error = R1 + R2 - L2 - L1;
+
+    int current_error = R1 * 0.90 + R2 * 0.45 \
+    - L2 * 0.45 - L1 * 0.90;
     int d_error = current_error - error;
-    int left = 100 + 0.3 * error + 0.2 * d_error;
-    int right = 100 - 0.5 * error - 0.2 * d_error;
+    // Serial.println(d_error);
+    int left = 100 + 0.4 * error + 0.3 * d_error;
+    int right = 100 - 0.5 * error - 0.3 * d_error;
+    if (M + R2 + L2 >= 900)
+        left = right = 200;
     error = current_error;
-    motorWrite(left * 0.8, right * 0.8);
+    //Serial.println(error);
+    motorWrite(left, right);
 }
 
 // if out of node return 0
@@ -175,32 +181,20 @@ int checkNode()
 
 void loop()
 {
-    static byte *id;
     static int time = 0;
     UID = rfid(idSize);
 
     //update sensor values
-    R1 = analogRead(IR0) * 0.7;
-    R2 = analogRead(IR1) * 0.5;
+    // R1 = analogRead(IR0) * 0.7;
+    // R2 = analogRead(IR1) * 0.5;
+    // M = analogRead(IR2);
+    // L2 = analogRead(IR3) * 0.6;
+    // L1 = analogRead(IR4) * 0.8;
+    R1 = analogRead(IR0);
+    R2 = analogRead(IR1) * 0.7;
     M = analogRead(IR2);
-    L2 = analogRead(IR3) * 0.6;
-    L1 = analogRead(IR4) * 0.8;
-
-    //#ifndef DEBUG
-    //  if (checkNode())
-    //    send_msg('p'); // to avoid confusion with card id
-    //  if (id = rfid(idSize))
-    //    send_byte(id, idSize);
-    //  turn(ask_BT());
-    //  tracking();
-    //#endif
-    //
-    //#ifdef DEBUG
-    //  tracking();
-    //  if (checkNode()) {
-    //    turn(STOP);
-    //  }
-    //#endif
+    L2 = analogRead(IR3);
+    L1 = analogRead(IR4) * 0.72;
 
     BT_CMD msg;
     static bool start_flag = false;
@@ -226,7 +220,6 @@ void loop()
         }
         // UID is the return value of rfid()
         // 0 if nothing detected
-        if (id = UID)
-            send_byte(id, idSize);
+        send_byte(UID, idSize);
     }
 }
