@@ -170,12 +170,14 @@ void tracking()
     static int error;
     updateIR();
     int current_error = R1 * 0.90 + R2 * 0.45 - L2 * 0.45 - L1 * 0.90;
-    int d_error = current_error - error;
+    int d_error = (current_error - error) * (current_error > 0 ? -1 : 1);
     // Serial.println(d_error);
-    int left = 0.4 * current_error + 0.3 * d_error * (current_error > 0 ? 1 : -1);
-    int right = -0.5 * current_error - 0.3 * d_error * (current_error > 0 ? 1 : -1);
-    if (M + R2 + L2 >= 900)
-        left = right = 0;
+    int left = 0.4 * current_error + 10 * d_error;
+    int right = -0.5 * current_error - 10 * d_error;
+    if (M + R2 + L2 >= 900){
+        left = 0;
+        right = 0;
+    }
     error = current_error;
 
     //Serial.println(error);
@@ -223,20 +225,20 @@ int checkNode()
 
 void loop()
 {
-    R1 = analogRead(IR0);
-    R2 = analogRead(IR1) * 0.7;
-    M = analogRead(IR2);
-    L2 = analogRead(IR3);
-    L1 = analogRead(IR4) * 0.72;
-    if (checkNode() == 0)
-    {
-        tracking();
-    }
-    else if (checkNode() == 2)
-    {
-        motorWrite(100, 100);
-    }
-    return;
+    // R1 = analogRead(IR0);
+    // R2 = analogRead(IR1) * 0.7;
+    // M = analogRead(IR2);
+    // L2 = analogRead(IR3);
+    // L1 = analogRead(IR4) * 0.72;
+    // if (checkNode() == 0)
+    // {
+    //     tracking();
+    // }
+    // else if (checkNode() == 2)
+    // {
+    //     motorWrite(100, 100);
+    // }
+    // return;
     static int i = 0;
     // static BT_CMD dir[] = {FORWARD, FORWARD, FORWARD, DAOCHE,
     //                        FORWARD, FORWARD, RIGHT,   LEFT,
