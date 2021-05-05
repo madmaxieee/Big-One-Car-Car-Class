@@ -172,8 +172,8 @@ void tracking()
     int current_error = R1 * 0.90 + R2 * 0.45 - L2 * 0.45 - L1 * 0.90;
     int d_error = current_error - error;
     // Serial.println(d_error);
-    int left = 0.4 * error + 0 * d_error;
-    int right = -0.5 * error - 0 * d_error;
+    int left = 0.4 * current_error + 0.3 * d_error * (current_error > 0 ? 1 : -1);
+    int right = -0.5 * current_error - 0.3 * d_error * (current_error > 0 ? 1 : -1);
     if (M + R2 + L2 >= 900)
         left = right = 0;
     error = current_error;
