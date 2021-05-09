@@ -40,12 +40,13 @@ void setup()
     mfrc522.PCD_Init();
     BT.begin(9600);
     Serial.println("Done setup");
+    delay(1000);
 }
 
 void motorWrite(float Vl, float Vr)
 {
     static int ticks = 0;
-    
+
     if (Vl > 255)
         Vl = 255;
     if (Vr > 255)
@@ -86,7 +87,7 @@ bool drive(BT_CMD direction)
         motorWrite(-180, 255);
         delay(250);
         // motorWrite(150, 150);
-        // BT.write('L');
+        BT.write('L');
     }
     else if (direction == RIGHT)
     {
@@ -98,7 +99,7 @@ bool drive(BT_CMD direction)
         delay(450);
         // motorWrite(150, 150);
         // Serial.println("RIGHT");
-        // BT.write('R');
+        BT.write('R');
     }
     else if (direction == BACK)
     {
@@ -109,7 +110,7 @@ bool drive(BT_CMD direction)
         motorWrite(-200, 200);
         delay(600);
         //Serial.println("BACK");
-        // BT.write('B');
+        BT.write('B');
     }
     else if (direction == STOP)
     {
@@ -128,7 +129,7 @@ bool drive(BT_CMD direction)
         motorWrite(150, 150);
         delay(200);
         //Serial.println("FORWARD");
-        // BT.write('F');
+        BT.write('F');
         return false;
     }
     else if (direction == START)
@@ -140,16 +141,23 @@ bool drive(BT_CMD direction)
     {
         stop = false;
         //turn left
-        motorWrite(-255, -255);
-        delay(50);
+        delay(200);
+        drive(STOP);
+        delay(500);
         motorWrite(-180, 255);
         delay(350);
+        //track for 0.6 s
+        clock = millis();
+        while(millis() - clock < 600){
+            tracking();
+        }
         //backup
-        motorWrite(-150, -150);
+        motorWrite(-100, -100);
         //wait for rfid
         while ((UID = rfid(idSize)) == 0)
         {
         }
+        send_byte(UID, idSize);
         motorWrite(200, 200);
         //Serial.println("DAOCHE");
     }
@@ -168,20 +176,22 @@ void updateIR()
 void tracking()
 {
     static int error;
+    // BT.write('T');
     updateIR();
     int current_error = R1 * 0.90 + R2 * 0.45 - L2 * 0.45 - L1 * 0.90;
     int d_error = (current_error - error) * (current_error > 0 ? -1 : 1);
     // Serial.println(d_error);
     int left = 0.4 * current_error + 10 * d_error;
     int right = -0.5 * current_error - 10 * d_error;
-    if (M + R2 + L2 >= 900){
+    if (M + R2 + L2 >= 900)
+    {
         left = 0;
         right = 0;
     }
     error = current_error;
 
     //Serial.println(error);
-    if (R1 < 200 && R2 < 200 && M < 200 && L1 < 200 && L2 < 200 && abs(error) < 100)
+    if ((R1 < 200 && R2 < 100 && M < 100 && L1 < 200 && L2 < 100 && abs(error) < 100))
     {
         motorWrite(-100, -100);
         return;
@@ -198,7 +208,7 @@ void tracking()
 int checkNode()
 {
     static int last_node_time = 0;
-    static const int threshold = 1500;
+    static const int threshold = 2000;
     // static double arr[10] {};
     static double sum = 0;
     // static int ticks = 0;
@@ -225,12 +235,16 @@ int checkNode()
 
 void loop()
 {
-    // R1 = analogRead(IR0);
-    // R2 = analogRead(IR1) * 0.7;
-    // M = analogRead(IR2);
-    // L2 = analogRead(IR3);
-    // L1 = analogRead(IR4) * 0.72;
-    // if (checkNode() == 0)
+    static int i = 0;
+    static BT_CMD dir[] = {FORWARD, FORWARD, FORWARD, DAOCHE, FORWARD,
+                           RIGHT, LEFT, DAOCHE, FORWARD};
+    // updateIR();
+    // if (checkNode() == 1)
+    // {
+    //     drive(dir[i]);
+    //     i++;
+    // }
+    // else if (checkNode() == 0)
     // {
     //     tracking();
     // }
@@ -239,12 +253,9 @@ void loop()
     //     motorWrite(100, 100);
     // }
     // return;
-    static int i = 0;
-    // static BT_CMD dir[] = {FORWARD, FORWARD, FORWARD, DAOCHE,
-    //                        FORWARD, FORWARD, RIGHT,   LEFT,
-    //                        RIGHT,   BACK,    FORWARD};
-    static BT_CMD dir[] = {LEFT, FORWARD, RIGHT, RIGHT, BACK, LEFT, RIGHT};
-    UID = rfid(idSize);
+    // static BT_CMD dir[] = {LEFT, FORWARD, RIGHT, RIGHT, BACK, LEFT, RIGHT};
+
+    // UID = rfid(idSize);
 
     static bool start_flag = false;
     BT_CMD msg;
@@ -262,8 +273,6 @@ void loop()
         updateIR();
         if (checkNode() == 1)
         {
-            // drive(STOP);
-            // delay(1000);
             drive(dir[i]);
             i++;
         }
@@ -275,10 +284,9 @@ void loop()
         {
             motorWrite(100, 100);
         }
-        //   motorWrite(200,200);
 
         // UID is the return value of rfid()
         // 0 if nothing detected (won't send anything)
-        send_byte(UID, idSize);
+        // send_byte(UID, idSize);
     }
 }
