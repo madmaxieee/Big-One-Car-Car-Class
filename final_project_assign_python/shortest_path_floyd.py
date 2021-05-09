@@ -43,7 +43,7 @@ class shortest_path_floyd():
                     n1=int(n1)
                     self.neighbor[n1][i]=0
             if cnt==1:
-                print(n1)
+                #print(n1)
                 self.treasure.append(n1)
         self.floyd()
 
