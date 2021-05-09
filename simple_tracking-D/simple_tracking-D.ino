@@ -34,7 +34,7 @@ void motorWrite(float Vl, float Vr)
   digitalWrite(IN2, Vl > 0 ? 0 : 1);
   digitalWrite(IN4, Vr > 0 ? 0 : 1);
 }
-
+//
 void tracking()
 {
   static int error;
@@ -79,11 +79,11 @@ void setup()
 
 void loop()
 {
-  R1 = analogRead(IR0) * 0.9;
-  R2 = analogRead(IR1) * 0.5;
-  M = analogRead(IR2);
-  L2 = analogRead(IR3) * 0.6;
-  L1 = analogRead(IR4) * 0.7;
+//  R1 = analogRead(IR0) * 0.9;
+//  R2 = analogRead(IR1) * 0.5;
+//  M = analogRead(IR2);
+//  L2 = analogRead(IR3) * 0.6;
+//  L1 = analogRead(IR4) * 0.7;
 
   // Serial.println(R1);
   // Serial.println(R2);
@@ -94,4 +94,5 @@ void loop()
   // delay(1000);
 
   tracking();
+  //motorWrite(200,200);
 }

@@ -11,21 +11,13 @@ class interface:
             if(port == "quit"):
                 self.ser.disconnect()
                 quit()
-            port = "COM8";
-            input("Connecting...");
-            # port = input("PC bluetooth port name: ")
+            port = input("PC bluetooth port name: ")
         input("Press enter to start.")
         self.ser.write('s')
     def send_dir(self,dir):
         self.ser.write(dir)
     def get_UID(self):
         return self.ser.SerialReadByte()
-    def get_p(self):
-        while True:
-            msg=self.ser.readByte()
-            print(msg)
-            if msg=='p':#pass
-                break
     def get_i(self):
         while True:
             msg=self.ser.readByte()
