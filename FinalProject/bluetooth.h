@@ -25,6 +25,14 @@ enum BT_CMD
     DAOCHE
 };
 
+char getChar(){
+    while (!BT.available())
+    {
+    }
+    char c;
+    return BT.read();
+}
+
 BT_CMD ask_BT()
 {
     BT_CMD message = NOTHING;
@@ -33,7 +41,12 @@ BT_CMD ask_BT()
     {
     }
     cmd = BT.read();
-    BT.write(cmd);
+    // delay(1);
+    #ifdef DEBUG
+    Serial.print("cmd : ");
+    Serial.println(cmd);
+    #endif
+//    BT.write(cmd);
     switch (cmd)
     {
     case 'r':
@@ -53,10 +66,6 @@ BT_CMD ask_BT()
     case 'd':
         return DAOCHE;
     }
-#ifdef DEBUG
-    Serial.print("cmd : ");
-    Serial.println(cmd);
-#endif
     return message;
 } // ask_BT
 
