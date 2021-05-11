@@ -84,7 +84,7 @@ bool drive(BT_CMD direction)
         stop = false;
         delay(400);
         drive(STOP);
-        delay(500);
+        delay(200);
         motorWrite(-180, 255);
         delay(300);
         // motorWrite(150, 150);
@@ -95,9 +95,9 @@ bool drive(BT_CMD direction)
         stop = false;
         delay(400);
         drive(STOP);
-        delay(500);
+        delay(200);
         motorWrite(255, -180);
-        delay(600);
+        delay(400);
         // motorWrite(150, 150);
         // Serial.println("RIGHT");
         BT.write('R');
@@ -107,9 +107,9 @@ bool drive(BT_CMD direction)
         stop = false;
         delay(100);
         drive(STOP);
-        delay(300);
+        delay(200);
         motorWrite(-200, 200);
-        delay(600);
+        delay(400);
         //Serial.println("BACK");
         BT.write('B');
     }
@@ -149,7 +149,8 @@ bool drive(BT_CMD direction)
         delay(350);
         //track for 0.8 s
         clock = millis();
-        while(millis() - clock < 800){
+        while (millis() - clock < 800)
+        {
             tracking();
         }
         //backup
@@ -194,13 +195,22 @@ void tracking()
     //Serial.println(error);
     if (R1 < 50 && R2 < 50 && M < 50 && L1 < 50 && L2 < 50)
     {
-        motorWrite(-140, -140);
+        left = -140;
+        right = -140;
         return;
     }
+
     if (error > 0)
-        motorWrite(140 + left, 140 + right);
+    {
+        left = 140 + left;
+        right = 140 + right;
+    }
     else
-        motorWrite(140 + left * 0.8, 140 + right * 0.8);
+    {
+        left = 140 + left * 0.8;
+        right = 140 + right * 0.8;
+    }
+    motorWrite(left, right);
 }
 
 // if out of node return 0

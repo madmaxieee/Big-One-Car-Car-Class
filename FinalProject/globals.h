@@ -11,3 +11,4 @@ int aVl[50] = {};
 double sVl = 0;
 int aVr[50] = {};
 double sVr = 0;
+bool RFID_flag = false;

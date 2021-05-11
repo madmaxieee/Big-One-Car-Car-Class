@@ -61,7 +61,7 @@ void setup()
 
     //get length
     int digit = 0;
-    int len = 0;
+    int len = 1;
     c = getChar();
 
     while (48 <= int(c) && int(c) <= 57)
@@ -97,10 +97,11 @@ void setup()
     }
 
     // get other directions
-    for (int i = 1; i < len; i++)
+    for (int i = 1; i < len - 1; i++)
     {
         dir[i] = ask_BT();
     }
+    dir[len - 1] = BACK;
 }
 
 void loop()
@@ -110,35 +111,32 @@ void loop()
     // static BT_CMD dir[] = {FORWARD, FORWARD, FORWARD, DAOCHE,
     //                        FORWARD, FORWARD, RIGHT,   LEFT,
     //                        RIGHT,   BACK,    FORWARD};
-
-    // static bool start_flag = true;
     BT_CMD msg;
-    // if (!start_flag)
-    // {
-    //     msg = ask_BT();
-    //     if (msg == START)
-    //     {
-    //         drive(msg);
-    //         start_flag = true;
-    //     }
-    // }
-    // else
-    // {
-        updateIR();
-        if (checkNode() == 1)
+    updateIR();
+
+    if (RFID_flag)
+    {
+        UID = rfid(idSize);
+        if (UID != 0)
         {
-            drive(dir[i]);
-            i++;
+            send_byte(UID, idSize);
+            RFID_flag = false;
         }
-        else if (checkNode() == 0)
-        {
-            tracking();
-        }
-        else if (checkNode() == 2)
-        {
-            motorWrite(140, 140);
-        }
-    // }
+    }
+
+    if (checkNode() == 1)
+    {
+        drive(dir[i]);
+        i++;
+    }
+    else if (checkNode() == 0)
+    {
+        tracking();
+    }
+    else if (checkNode() == 2)
+    {
+        motorWrite(140, 140);
+    }
 }
 
 void motorWrite(float Vl, float Vr)
@@ -229,7 +227,7 @@ bool drive(BT_CMD direction)
         stop = false;
         delay(400);
         drive(STOP);
-        delay(500);
+        delay(200);
         motorWrite(-180, 255);
         delay(300);
         // motorWrite(150, 150);
@@ -240,7 +238,7 @@ bool drive(BT_CMD direction)
         stop = false;
         delay(400);
         drive(STOP);
-        delay(500);
+        delay(200);
         motorWrite(255, -180);
         delay(400);
         // motorWrite(150, 150);
@@ -252,10 +250,11 @@ bool drive(BT_CMD direction)
         stop = false;
         delay(100);
         drive(STOP);
-        delay(300);
+        delay(200);
         motorWrite(-200, 200);
-        delay(600);
+        delay(400);
         //Serial.println("BACK");
+        RFID_flag = true;
         BT.write('B');
     }
     else if (direction == STOP)
