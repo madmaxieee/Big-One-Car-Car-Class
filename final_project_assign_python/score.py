@@ -15,44 +15,39 @@ import sys
 
 
 class Scoreboard:
-    '''
-    The Scoreboard class connects to the server socket and enables updating score by sending UID.
-    '''
-    def __init__(self, filepath, teamName, host="http://192.168.50.14:3000"):
-
-        # INIT VARIABLES
+    def __init__(self, filepath, teamName):
+        # no need to read localfile
 
         self.totalScore = 0
         self.team = teamName
         self.game = 0
-        self.ip = host
-        #self.ip = 'https://creative.ntuee.org'
+        self.ip = 'http://192.168.50.14:3000'
 
-        print(f"{self.team} wants to play!")
-        print(f"connecting to server......{self.ip}")
+        print("{} wants to play Game{}!".format(self.team, self.game))
+        print("connecting to server......{}".format(self.ip))
+        self.Socket = Socket(self.ip)
 
-        # CONNECT WITH SERVER SOCKET
+        try:
+            g = requests.get(self.ip+'/game_status')
+            playing_team = g.json()['current_team']
+            if(playing_team != None):
+                if(playing_team != teamName):
+                    print('{} is current playing.\nPlease wait {} seconds for retry.'.format(
+                        g.json()['current_team'], g.json()['time_remain']))
+                    self.Socket.disconnect()
+                    sys.exit(1)
+            else:
+                print("Game is starting.....")
+                self.Socket.start_game(
+                    {'gamemode': self.game, 'team': self.team})
 
-        # create socket.io instance and connect to server
-        self.socket = Socket(self.ip)
+        except:
+            print("Failed to get game status or someone else is playing")
+            print("Exiting the game.....")
 
-        # GET INFORMATION FROM SERVER
-        
-        res = requests.get(self.ip + '/game_status')
-        if res.status_code == 404:
-            raise ConnectionError('Response[404] from /game_status')
-        playing_team = res.json()['current_team']
-        if playing_team is None:
-            print("Game is starting.....")
-            self.socket.start_game({ 
-                'gamemode': self.game, 
-                'team': self.team })
-        elif playing_team != teamName:
-            self.socket.disconnect()
-            raise ConnectionError(f"{g.json()['current_team']} is current playing.\nPlease wait {g.json()['time_remain']} seconds for retry.")                
+            sys.exit(1)
 
     def add_UID(self, UID_str):
-        '''Send {UID_str} to server to update score. Returns nothing.'''
         UID_type = type(UID_str)
         UID_len = len(UID_str)
         print("In add_UID, UID = {}".format(UID_str))
@@ -60,7 +55,7 @@ class Scoreboard:
             print("    UID type error! (Your type: {})".format(UID_type.__name__))
         if(UID_len != 8):
             print("    UID length error! (Your length: {})".format(UID_len))
-        self.socket.add_UID({'uid_str': UID_str})
+        self.Socket.add_UID({'uid_str': UID_str})
 
     def getCurrentScore(self):
         try:
@@ -71,6 +66,8 @@ class Scoreboard:
             return None
         # return int(self.totalScore)
 
+    def end(self):
+        self.Socket.disconnect()
 
 # ================================================================
 # Socket interface
@@ -90,8 +87,8 @@ class Socket(socketio.ClientNamespace):
         self.ip = ip
         try:
             self.sio.connect(self.ip)
-        except Exception as e:
-            print('Failed to connect to server, ', e)
+        except:
+            print('Failed to connect to server')
             sys.exit(1)
         self.sio.register_namespace(self)
 
@@ -119,13 +116,11 @@ class Socket(socketio.ClientNamespace):
 
     def add_UID(self, UID_str):
         self.emit("add_UID", UID_str)
-         
-    #secret backdoor for TA
-    def stop_game(self):
-        self.emit("stop_game")
 
 
 if __name__ == '__main__':
-    myScoreboard = Scoreboard(None,'Test')
+    myScoreboard = Scoreboard(None, '隊伍名稱')
     myScoreboard.add_UID("D0B373A2")
+    myScoreboard.add_UID("929A2121")
     print(myScoreboard.getCurrentScore())
+    myScoreboard.end()

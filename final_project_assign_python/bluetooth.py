@@ -43,11 +43,11 @@ class bluetooth:
     def SerialReadByte(self):
         sleep(0.05)
         waiting = self.ser.inWaiting()
-        rv = self.ser.read(waiting)
+        rv = self.ser.read(waiting).hex()
         if(rv):
-            UID = hex(int.from_bytes(rv, byteorder='big', signed=False))
+            #UID = hex(int.from_bytes(rv, byteorder='big', signed=False))
             self.ser.flushInput()
-            return UID
+            return rv
         else:
             return 0
 

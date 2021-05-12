@@ -15,7 +15,7 @@ class bluetooth:
     def waiting(self) -> bool:
         return self.ser.in_waiting
 
-    def do_connect(self, port: str="com6", baudrate: int = 9600) -> bool:
+    def do_connect(self, port: str="com17", baudrate: int = 9600) -> bool:
         """ Connect to the specify port with particular baudrate """
         # Connection function. Disconnect the previous communication, specify a new one.
         self.disconnect()
@@ -38,10 +38,10 @@ class bluetooth:
     def readByte(self):
         sleep(0.05)
         waiting = self.ser.inWaiting()
-        print(waiting)
+        #print(waiting)
         if waiting >= 0:
             rv = self.ser.read(1).decode("utf-8")
-            print(rv)
+            #print(rv)
             return rv
         return ""
 
