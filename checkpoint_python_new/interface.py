@@ -6,12 +6,12 @@ class interface:
         print("Arduino Bluetooth Connect Program.")
         print("")
         self.ser = BT.bluetooth()
-        port = "com6"
+        port = "com17"
         while(not self.ser.do_connect(port)):
             if(port == "quit"):
                 self.ser.disconnect()
                 quit()
-            port = input("PC bluetooth port name: ")
+            port = "com17"
         input("Press enter to start.")
         self.ser.write('s')
     def send_dir(self,dir):

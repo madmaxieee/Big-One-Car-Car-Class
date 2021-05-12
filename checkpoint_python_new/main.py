@@ -1,7 +1,7 @@
 import interface
 def main():
     interf = interface.interface()
-    for i in range(3):
+    for i in range(4):
         print("RFID!!!!!!")
         interf.get_i()
         uid=interf.get_UID()

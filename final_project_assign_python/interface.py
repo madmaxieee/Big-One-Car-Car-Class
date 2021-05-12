@@ -3,25 +3,25 @@ import bluetooth as BT
 import shortest_path_floyd as spf
 import score
 from time import sleep
-maze_path = "data/small_maze.csv"
+maze_path = "data/final_map_109.csv"
 dir=[['','f','b','l','r'],['','l','r','b','f'],['','b','f','r','l'],['','r','l','f','b']];
 all_path=[]
 # hint: You may design additional functions to execute the input command, which will be helpful when debugging :)
 
 class interface:
     def __init__(self):
-        print("")
-        print("Arduino Bluetooth Connect Program.")
-        print("")
+        # print("")
+        # print("Arduino Bluetooth Connect Program.")
+        # print("")
         all_path_length=0
         maze = spf.shortest_path_floyd(maze_path)
         self.ser = BT.bluetooth()
-        port = input("PC bluetooth port name: ")
+        port = "com17"
         while(not self.ser.do_connect(port)):
             if(port == "quit"):
                 self.ser.disconnect()
                 quit()
-            port = input("PC bluetooth port name: ")
+            port = "com17"
         input("Press enter to start.")
         self.ser.write('s')
         now = 1
