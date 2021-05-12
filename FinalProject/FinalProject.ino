@@ -229,7 +229,7 @@ bool drive(BT_CMD direction)
         drive(STOP);
         delay(200);
         motorWrite(-180, 255);
-        delay(300);
+        delay(400);
         // motorWrite(150, 150);
         BT.write('L');
     }
@@ -240,7 +240,7 @@ bool drive(BT_CMD direction)
         drive(STOP);
         delay(200);
         motorWrite(255, -180);
-        delay(400);
+        delay(450);
         // motorWrite(150, 150);
         // Serial.println("RIGHT");
         BT.write('R');
@@ -252,7 +252,7 @@ bool drive(BT_CMD direction)
         drive(STOP);
         delay(200);
         motorWrite(-200, 200);
-        delay(400);
+        delay(600);
         //Serial.println("BACK");
         RFID_flag = true;
         BT.write('B');
@@ -272,7 +272,7 @@ bool drive(BT_CMD direction)
     {
         stop = false;
         motorWrite(150, 150);
-        delay(200);
+        delay(250);
         //Serial.println("FORWARD");
         BT.write('F');
         return false;
@@ -324,7 +324,6 @@ void updateIR()
 // if in node return 2
 int checkNode()
 {
-    static int last_node_time = 0;
     static const int threshold = 2000;
     // static double arr[10] {};
     static double sum = 0;

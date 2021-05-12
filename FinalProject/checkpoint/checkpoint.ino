@@ -247,10 +247,10 @@ int checkNode()
 void loop()
 {
     static int i = 0;
-    static BT_CMD dir[] = {DAOCHE};
-    // static BT_CMD dir[] = {FORWARD, FORWARD, FORWARD, DAOCHE,
-    //                        FORWARD, FORWARD, RIGHT,   LEFT,
-    //                        RIGHT,   BACK,    FORWARD};
+    // static BT_CMD dir[] = {DAOCHE};
+    static BT_CMD dir[] = {FORWARD, FORWARD, FORWARD, DAOCHE,
+                           FORWARD, RIGHT,   LEFT,
+                           RIGHT,   BACK,    FORWARD};
 
     static bool start_flag = true;
     BT_CMD msg;
